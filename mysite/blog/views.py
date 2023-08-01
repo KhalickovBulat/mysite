@@ -1,3 +1,4 @@
+from django.http import HttpResponse        
 from django.shortcuts import render, get_object_or_404
 from . models import Post, Comment
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
@@ -6,7 +7,7 @@ from django.core.mail import send_mail
 from django.views.decorators.http import require_POST
 # Create your views here.
 
-def post_list(request):
+def post_list(request:HttpResponse):
     post_list = Post.published.all()
     # Постраничная разбивка с 3 постами на страницу
     paginator = Paginator(post_list, 3)
@@ -25,7 +26,7 @@ def post_list(request):
                   'blog/post/list.html', 
                   {'posts':posts})
 
-def post_detail(request, year, month, day, post):
+def post_detail(request:HttpResponse, year:int, month:int, day:int, post:Post):
     post = get_object_or_404(Post, 
                              
                              status=Post.Status.PUBLISHED,
@@ -63,7 +64,7 @@ def post_share(request, post_id):
                                                     'sent':sent})
 
 @require_POST
-def post_comment(request, post_id):
+def post_comment(request:HttpResponse, post_id):
     post = get_object_or_404(Post, 
                              id=post_id,
                              status=Post.Status.PUBLISHED)
