@@ -2,7 +2,7 @@ from django.http import HttpResponse
 from django.shortcuts import render, get_object_or_404
 from . models import Post, Comment
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
-from .form import EmailPostForm, CommentForm
+from .forms import EmailPostForm, CommentForm
 from django.core.mail import send_mail
 from django.views.decorators.http import require_POST
 # Create your views here.
@@ -35,9 +35,13 @@ def post_detail(request:HttpResponse, year:int, month:int, day:int, post:Post):
                              publish__month=month,
                              publish__day=day)
     
+    comments = post.comments.filter(active=True)
+    form = CommentForm()
     return render(request, 
                   'blog/post/detail.html', 
-                  {'post':post})
+                  {'post':post,
+                  'comments': comments,
+                  'form': form})
 
 def post_share(request, post_id):
     # Извлечь пост по его id
