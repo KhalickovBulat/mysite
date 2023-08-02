@@ -18,7 +18,7 @@ class Post(models.Model):
         DRAFT = 'DR', 'Draft'
         PUBLISHED = 'PB', 'Published'
 
-    tags = TaggableManager()
+    
     title = models.CharField(max_length=250)
     slug = models.SlugField(max_length=250,
                             unique_for_date='publish')
@@ -34,7 +34,8 @@ class Post(models.Model):
                               default=Status.DRAFT)
     objects = models.Manager()
     published = PublishedManager()
-
+    tags = TaggableManager()
+    
     class Meta:
         ordering = ['-publish']
         indexes = [

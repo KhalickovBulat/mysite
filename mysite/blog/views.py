@@ -1,14 +1,20 @@
 from django.http import HttpResponse        
 from django.shortcuts import render, get_object_or_404
+from django.test import tag
 from . models import Post, Comment
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from .forms import EmailPostForm, CommentForm
 from django.core.mail import send_mail
 from django.views.decorators.http import require_POST
+from taggit.models import Tag
 # Create your views here.
 
-def post_list(request:HttpResponse):
+def post_list(request:HttpResponse, tag_slug=None):
     post_list = Post.published.all()
+    tag = None
+    if tag_slug:
+        tag = get_object_or_404(Tag, slug=tag_slug)
+        post_list = post_list.filter(tags__in=[tag])
     # Постраничная разбивка с 3 постами на страницу
     paginator = Paginator(post_list, 3)
     page_number = request.GET.get('page')
@@ -24,7 +30,8 @@ def post_list(request:HttpResponse):
         posts = paginator.page(paginator.num_pages)
     return render(request, 
                   'blog/post/list.html', 
-                  {'posts':posts})
+                  {'posts':posts,
+                   'tag': tag})
 
 def post_detail(request:HttpResponse, year:int, month:int, day:int, post:Post):
     post = get_object_or_404(Post, 
